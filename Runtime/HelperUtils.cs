@@ -4,14 +4,21 @@ namespace FeatureLogger.Runtime
 {
     internal static class HelperUtils
     {
-        internal static string GetFinalisedMessage(string label, string message, Color color)
+        internal const string FEATURELOGGER_TAG = "[FeatureLogger]";
+
+        internal static string GetFinalisedMessage(string label, string message, Color color, bool isMessageContentsStyled)
         {
-            return $"{GetHexColorString(color)} [{label}]</color> {message}";
+            if (isMessageContentsStyled)
+            {
+                return $"<color=#{ColorUtility.ToHtmlStringRGB(color)}> [{label}] {message}</color>";
+            }
+
+            return $"<color=#{ColorUtility.ToHtmlStringRGB(color)}> [{label}]</color> {message}";
         }
 
-        internal static string GetHexColorString(Color color)
+        internal static string GetFinalisedMessageWithoutColour(string label, string message)
         {
-            return $"<color=#{ColorUtility.ToHtmlStringRGB(color)}>";
+            return $"[{label}] {message}";
         }
     }
 }

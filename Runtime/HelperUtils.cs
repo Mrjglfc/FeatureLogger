@@ -15,10 +15,5 @@ namespace FeatureLogger.Runtime
 
             return $"<color=#{ColorUtility.ToHtmlStringRGB(color)}> [{label}]</color> {message}";
         }
-
-        internal static string GetFinalisedMessageWithoutColour(string label, string message)
-        {
-            return $"[{label}] {message}";
-        }
     }
 }

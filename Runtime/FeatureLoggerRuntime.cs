@@ -7,10 +7,9 @@ namespace FeatureLogger.Runtime
     public class FeatureLoggerRuntime : MonoBehaviour
     {
         [SerializeField] private FeatureInfoContainer featureInfoContainer;
-        private static Dictionary<string, FeatureInfo> features;
 
-        private static bool overrideConsoleStyling;
-        private static bool willColorEntireMessageContents;
+        private static Dictionary<string, FeatureInfo> features;
+        private static FeatureInfoContainer FeatureInfoContainer;
 
         private void Awake()
         {
@@ -21,19 +20,17 @@ namespace FeatureLogger.Runtime
                 return;
             }
 
+            FeatureInfoContainer = featureInfoContainer;
+
             // Convert to dictionary as logger runtime will need to do fast lookup.
             // Also only pulls values which have been marked as "Enabled".
-            features = featureInfoContainer.featureGroups.Where(x => x.Enabled).ToDictionary(x => x.Name, x => x);
+            features = FeatureInfoContainer.featureGroups.Where(x => x.Enabled).ToDictionary(x => x.Name, x => x);
 
             if (features.Count == 0 || features == null)
             {
                 Debug.LogWarning($"{HelperUtils.FEATURELOGGER_TAG} There are no groups enabled or assigned within the FeatureContainer ScriptableObject.\n" +
                     $"FeatureLogger will not be working as expected");
             }
-
-            // Assigning static variables in here
-            overrideConsoleStyling = featureInfoContainer.overrideConsoleStyling;
-            willColorEntireMessageContents = featureInfoContainer.willColorEntireMessageContents;
         }
 
         #region Debug Logs
@@ -41,7 +38,7 @@ namespace FeatureLogger.Runtime
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Debug))
             {
-                Debug.Log($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, willColorEntireMessageContents)}");
+                Debug.Log($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}");
             }
         }
 
@@ -49,7 +46,7 @@ namespace FeatureLogger.Runtime
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Debug))
             {
-                Debug.Log($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, willColorEntireMessageContents)}", context);
+                Debug.Log($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}", context);
             }
         }
         #endregion
@@ -59,13 +56,13 @@ namespace FeatureLogger.Runtime
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Warning))
             {
-                if (overrideConsoleStyling)
+                if (FeatureInfoContainer.overrideConsoleStyling)
                 {
-                    Debug.LogWarning($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, willColorEntireMessageContents)}");
+                    Debug.LogWarning($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}");
                 }
                 else
                 {
-                    Debug.LogWarning($"{HelperUtils.GetFinalisedMessageWithoutColour(label, message)}");
+                    Debug.LogWarning($"{HelperUtils.GetFinalisedMessage(label, message, Color.yellow, FeatureInfoContainer.willColorEntireMessageContents)}");
                 }
             }
         }
@@ -74,13 +71,13 @@ namespace FeatureLogger.Runtime
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Warning))
             {
-                if (overrideConsoleStyling)
+                if (FeatureInfoContainer.overrideConsoleStyling)
                 {
-                    Debug.LogWarning($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, willColorEntireMessageContents)}", context);
+                    Debug.LogWarning($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}", context);
                 }
                 else
                 {
-                    Debug.LogWarning($"{HelperUtils.GetFinalisedMessageWithoutColour(label, message)}", context);
+                    Debug.LogWarning($"{HelperUtils.GetFinalisedMessage(label, message, Color.yellow, FeatureInfoContainer.willColorEntireMessageContents)}", context);
                 }
             }
         }
@@ -91,13 +88,13 @@ namespace FeatureLogger.Runtime
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Error))
             {
-                if (overrideConsoleStyling)
+                if (FeatureInfoContainer.overrideConsoleStyling)
                 {
-                    Debug.LogError($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, willColorEntireMessageContents)}");
+                    Debug.LogError($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}");
                 }
                 else
                 {
-                    Debug.LogError($"{HelperUtils.GetFinalisedMessageWithoutColour(label, message)}");
+                    Debug.LogError($"{HelperUtils.GetFinalisedMessage(label, message, Color.red, FeatureInfoContainer.willColorEntireMessageContents)}");
                 }
             }
         }
@@ -106,13 +103,13 @@ namespace FeatureLogger.Runtime
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Error))
             {
-                if (overrideConsoleStyling)
+                if (FeatureInfoContainer.overrideConsoleStyling)
                 {
-                    Debug.LogError($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, willColorEntireMessageContents)}", context);
+                    Debug.LogError($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}", context);
                 }
                 else
                 {
-                    Debug.LogError($"{HelperUtils.GetFinalisedMessageWithoutColour(label, message)}", context);
+                    Debug.LogError($"{HelperUtils.GetFinalisedMessage(label, message, Color.red, FeatureInfoContainer.willColorEntireMessageContents)}", context);
                 }
             }
         }
@@ -123,7 +120,7 @@ namespace FeatureLogger.Runtime
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Assert))
             {
-                Debug.LogAssertion($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, willColorEntireMessageContents)}");
+                Debug.LogAssertion($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}");
             }
         }
 
@@ -131,7 +128,7 @@ namespace FeatureLogger.Runtime
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Assert))
             {
-                Debug.LogAssertion($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, willColorEntireMessageContents)}", context);
+                Debug.LogAssertion($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}", context);
             }
         }
         #endregion

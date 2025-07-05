@@ -1,4 +1,5 @@
-﻿using UnityEngine;
+﻿using System.IO;
+using UnityEngine;
 
 namespace FeatureLogger.Runtime
 {
@@ -14,6 +15,11 @@ namespace FeatureLogger.Runtime
             }
 
             return $"<color=#{ColorUtility.ToHtmlStringRGB(color)}> [{label}]</color> {message}";
+        }
+
+        internal static string GetCallerContext(string file, int line, string member)
+        {
+            return $"[{Path.GetFileName(file)}:{line} - {member}]";
         }
     }
 }

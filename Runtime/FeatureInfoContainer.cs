@@ -10,7 +10,7 @@ namespace FeatureLogger.Runtime
         public bool overrideConsoleStyling = false;
 
         [Tooltip("Will use the specified color to style the entire message contents instead of just the group tag")]
-        public bool willColorEntireMessageContents = false;
+        public bool colorEntireMessage = false;
 
         [Header("Feature-Specific Settings")]
         public FeatureInfo[] featureGroups;

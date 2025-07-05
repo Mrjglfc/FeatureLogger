@@ -1,17 +1,18 @@
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using UnityEngine;
 
 namespace FeatureLogger.Runtime
 {
     public class FeatureLoggerRuntime : MonoBehaviour
     {
-        [SerializeField] private FeatureInfoContainer featureInfoContainer;
+        public FeatureInfoContainer featureInfoContainer;
 
         private static Dictionary<string, FeatureInfo> features;
         private static FeatureInfoContainer FeatureInfoContainer;
 
-        private void Awake()
+        private void Start()
         {
             // Null & bounds check to make sure container has data inside.
             if (featureInfoContainer == null)
@@ -34,83 +35,83 @@ namespace FeatureLogger.Runtime
         }
 
         #region Debug Logs
-        public static void Log(string label, string message)
+        public static void Log(string label, string message,
+            [CallerMemberName] string member = "",
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0)
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Debug))
             {
-                Debug.Log($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}");
+                string finalisedMessage = HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.colorEntireMessage);
+                Debug.Log(message: $"{HelperUtils.GetCallerContext(file, line, member)} {finalisedMessage}");
             }
         }
 
-        public static void Log(string label, string message, GameObject context)
+        public static void Log(string label, string message, GameObject context,
+            [CallerMemberName] string member = "",
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0)
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Debug))
             {
-                Debug.Log($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}", context);
+                string finalisedMessage = HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.colorEntireMessage);
+                Debug.Log(message: $"{HelperUtils.GetCallerContext(file, line, member)} {finalisedMessage}", context);
             }
         }
         #endregion
 
         #region Warning Logs
-        public static void LogWarning(string label, string message)
+        public static void LogWarning(string label, string message,
+            [CallerMemberName] string member = "",
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0)
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Warning))
             {
-                if (FeatureInfoContainer.overrideConsoleStyling)
-                {
-                    Debug.LogWarning($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}");
-                }
-                else
-                {
-                    Debug.LogWarning($"{HelperUtils.GetFinalisedMessage(label, message, Color.yellow, FeatureInfoContainer.willColorEntireMessageContents)}");
-                }
+                Color color = FeatureInfoContainer.overrideConsoleStyling ? featureInfo.Color : Color.yellow;
+                string finalisedMessage = HelperUtils.GetFinalisedMessage(label, message, color, FeatureInfoContainer.colorEntireMessage);
+                Debug.LogWarning($"{HelperUtils.GetCallerContext(file, line, member)} {finalisedMessage}");
             }
         }
 
-        public static void LogWarning(string label, string message, GameObject context)
+        public static void LogWarning(string label, string message, GameObject context,
+            [CallerMemberName] string member = "",
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0)
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Warning))
             {
-                if (FeatureInfoContainer.overrideConsoleStyling)
-                {
-                    Debug.LogWarning($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}", context);
-                }
-                else
-                {
-                    Debug.LogWarning($"{HelperUtils.GetFinalisedMessage(label, message, Color.yellow, FeatureInfoContainer.willColorEntireMessageContents)}", context);
-                }
+                Color color = FeatureInfoContainer.overrideConsoleStyling ? featureInfo.Color : Color.yellow;
+                string finalisedMessage = HelperUtils.GetFinalisedMessage(label, message, color, FeatureInfoContainer.colorEntireMessage);
+                Debug.LogWarning($"{HelperUtils.GetCallerContext(file, line, member)} {finalisedMessage}", context);
             }
         }
         #endregion
 
         #region Error Logs
-        public static void LogError(string label, string message)
+        public static void LogError(string label, string message,
+            [CallerMemberName] string member = "",
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0)
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Error))
             {
-                if (FeatureInfoContainer.overrideConsoleStyling)
-                {
-                    Debug.LogError($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}");
-                }
-                else
-                {
-                    Debug.LogError($"{HelperUtils.GetFinalisedMessage(label, message, Color.red, FeatureInfoContainer.willColorEntireMessageContents)}");
-                }
+                Color color = FeatureInfoContainer.overrideConsoleStyling ? featureInfo.Color : Color.red;
+                string finalisedMessage = HelperUtils.GetFinalisedMessage(label, message, color, FeatureInfoContainer.colorEntireMessage);
+                Debug.LogError($"{HelperUtils.GetCallerContext(file, line, member)} {finalisedMessage}");
             }
         }
 
-        public static void LogError(string label, string message, GameObject context)
+        public static void LogError(string label, string message, GameObject context,
+            [CallerMemberName] string member = "",
+            [CallerFilePath] string file = "",
+            [CallerLineNumber] int line = 0)
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Error))
             {
-                if (FeatureInfoContainer.overrideConsoleStyling)
-                {
-                    Debug.LogError($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}", context);
-                }
-                else
-                {
-                    Debug.LogError($"{HelperUtils.GetFinalisedMessage(label, message, Color.red, FeatureInfoContainer.willColorEntireMessageContents)}", context);
-                }
+                Color color = FeatureInfoContainer.overrideConsoleStyling ? featureInfo.Color : Color.red;
+                string finalisedMessage = HelperUtils.GetFinalisedMessage(label, message, color, FeatureInfoContainer.colorEntireMessage);
+                Debug.LogError($"{HelperUtils.GetCallerContext(file, line, member)} {finalisedMessage}", context);
             }
         }
         #endregion
@@ -120,7 +121,7 @@ namespace FeatureLogger.Runtime
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Assert))
             {
-                Debug.LogAssertion($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}");
+                Debug.LogAssertion($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.colorEntireMessage)}");
             }
         }
 
@@ -128,9 +129,19 @@ namespace FeatureLogger.Runtime
         {
             if (features.TryGetValue(label, out FeatureInfo featureInfo) && featureInfo.Severity.HasFlag(LogSeverityEnum.Assert))
             {
-                Debug.LogAssertion($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.willColorEntireMessageContents)}", context);
+                Debug.LogAssertion($"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.colorEntireMessage)}", context);
             }
         }
         #endregion
+
+        public static string GetRawFinalisedMessage(string label, string message)
+        {
+            if (features.TryGetValue(label, out FeatureInfo featureInfo))
+            {
+                return $"{HelperUtils.GetFinalisedMessage(label, message, featureInfo.Color, FeatureInfoContainer.colorEntireMessage)}";
+            }
+
+            return string.Empty;
+        }
     }
 }
